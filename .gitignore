@@ -1,0 +1,22 @@
+# Віртуальні оточення
+venv/
+.venv/
+env/
+
+# Кеш Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Дані користувача (зберігаються локально, не в репозиторії)
+*.pkl
+*.pickle
+data/
+.personal_assistant/
+
+# IDE та ОС
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
