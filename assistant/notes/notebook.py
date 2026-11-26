@@ -26,12 +26,11 @@ class NoteBook(UserDict):
     def edit(self, note_id, new_text):
         """"Replace the text by ID"""
         if note_id not in self.data:
-            raise KeyError(f"Note {note_id} not found")        
+            raise KeyError(f"Note {note_id} not found")
         self.data[note_id].text = new_text
 
     def delete(self, note_id):
         """Delete note by ID"""
         if note_id not in self.data:
-            raise KeyError("Note {note_id} not found")
+            raise KeyError(f"Note {note_id} not found")
         del self.data[note_id]
-
