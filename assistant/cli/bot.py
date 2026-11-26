@@ -108,7 +108,11 @@ def main():
     print("Welcome to the assistant bot!")
     print(MENU)
     while True:
-        user_input = input("Enter a command: ")
+        try:
+            user_input = input("Enter a command: ")
+        except (KeyboardInterrupt, EOFError):
+            print("\nGood bye!")
+            break
         if not user_input.strip():
             print("Invalid command.")
             continue
