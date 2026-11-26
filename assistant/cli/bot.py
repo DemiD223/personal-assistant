@@ -64,6 +64,8 @@ def change_contact(args, book):
 @input_error
 def show_phone(args, book):
     """Show all phones of a contact."""
+    if not args:
+        raise ValueError("Give me a name please.")
     name = args[0]
     record = book.find(name)
     if record is None:
