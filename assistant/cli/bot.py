@@ -7,6 +7,12 @@ from assistant.cli.decorators import input_error
 from assistant.contacts import AddressBook, Record
 from assistant.notes.note import Note
 from assistant.notes.notebook import NoteBook
+from assistant.storage.storage import (
+    CONTACTS_FILE,
+    NOTEBOOK_FILE,
+    load_data,
+    save_data,
+)
 
 MENU = """Available commands:
   hello                          - greeting
@@ -97,8 +103,8 @@ def delete_note(args, notebook):
 
 def main():
     """Run the command loop until 'exit' or 'close'."""
-    book = AddressBook()
-    notebook = NoteBook()
+    book = load_data(CONTACTS_FILE, AddressBook)
+    notebook = load_data(NOTEBOOK_FILE, NoteBook)
     print("Welcome to the assistant bot!")
     print(MENU)
     while True:
@@ -117,15 +123,19 @@ def main():
             print(MENU)
         elif command == "add":
             print(add_contact(args, book))
+            save_data(book, CONTACTS_FILE)
         elif command == "change":
             print(change_contact(args, book))
+            save_data(book, CONTACTS_FILE)
         elif command == "phone":
             print(show_phone(args, book))
         elif command == "all":
             print(show_all(book))
         elif command == "add-note":
             print(add_note(args, notebook))
+            save_data(notebook, NOTEBOOK_FILE)
         elif command == "delete-note":
             print(delete_note(args, notebook))
+            save_data(notebook, NOTEBOOK_FILE)
         else:
             print("Invalid command.")
