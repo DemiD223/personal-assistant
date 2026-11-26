@@ -17,5 +17,13 @@ def load_data(path, default_factory):
     """Load an object from a pickle file or create a new one if missing."""
     if not path.exists():
         return default_factory()
-    with open(path, "rb") as file:
-        return pickle.load(file)
+    try:
+        with open(path, "rb") as file:
+            return pickle.load(file)
+    except (pickle.UnpicklingError, EOFError, ValueError,
+            AttributeError, ModuleNotFoundError):
+        backup = path.with_suffix(".bak")
+        path.replace(backup)
+        print(f"Warning: {path.name} is damaged, saved as {backup.name}. "
+              "Starting with empty data.")
+        return default_factory()
