@@ -5,6 +5,8 @@ Handlers work with AddressBook and Record from homework 06.
 
 from assistant.cli.decorators import input_error
 from assistant.contacts import AddressBook, Record
+from assistant.notes.note import Note
+from assistant.notes.notebook import NoteBook
 
 MENU = """Available commands:
   hello                          - greeting
@@ -12,6 +14,8 @@ MENU = """Available commands:
   change <name> <old> <new>      - change a phone
   phone <name>                   - show phones of a contact
   all                            - show all contacts
+  add-note <text>                - add a note
+  delete-note <ID>               - delete a note
   help                           - show this menu
   exit | close                   - quit"""
 
@@ -46,7 +50,7 @@ def change_contact(args, book):
     name, old_phone, new_phone, *_ = args
     record = book.find(name)
     if record is None:
-        raise KeyError(name)
+        raise KeyError(f"Contact {name} not found.")
     record.edit_phone(old_phone, new_phone)
     return "Contact updated."
 
@@ -57,7 +61,7 @@ def show_phone(args, book):
     name = args[0]
     record = book.find(name)
     if record is None:
-        raise KeyError(name)
+        raise KeyError(f"Contact {name} not found.")
     return "; ".join(p.value for p in record.phones) or "No phones."
 
 
@@ -69,9 +73,32 @@ def show_all(book):
     return "\n".join(str(record) for record in book.values())
 
 
+@input_error
+def add_note(args, notebook):
+    """Add a new note."""
+    if not args:
+        raise ValueError("Give me note text please.")
+    note = Note(" ".join(args))
+    note_id = notebook.add(note)
+    return f"Note {note_id} added."
+
+
+@input_error
+def delete_note(args, notebook):
+    """Delete a note by its ID."""
+    if not args:
+        raise ValueError("Give me note ID please.")
+    if not args[0].isdigit():
+        raise ValueError("Note ID must be a number.")
+    note_id = int(args[0])
+    notebook.delete(note_id)
+    return f"Note {note_id} deleted."
+
+
 def main():
     """Run the command loop until 'exit' or 'close'."""
     book = AddressBook()
+    notebook = NoteBook()
     print("Welcome to the assistant bot!")
     print(MENU)
     while True:
@@ -96,5 +123,9 @@ def main():
             print(show_phone(args, book))
         elif command == "all":
             print(show_all(book))
+        elif command == "add-note":
+            print(add_note(args, notebook))
+        elif command == "delete-note":
+            print(delete_note(args, notebook))
         else:
             print("Invalid command.")

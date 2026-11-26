@@ -12,8 +12,8 @@ def input_error(func):
             return func(*args, **kwargs)
         except ValueError as error:
             return str(error) or "Give me name and phone please."
-        except KeyError:
-            return "Contact not found."
+        except KeyError as error:
+            return error.args[0] if error.args else "Not found."
         except IndexError:
             return "Enter user name."
 
