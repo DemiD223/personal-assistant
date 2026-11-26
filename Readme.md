@@ -61,10 +61,10 @@ personal-assistant/
 
 | Роль | Учасник |
 |---|---|
-| Тімлід | |
+| Тімлід | [@DemiD223](https://github.com/DemiD223) |
 | Скрам-майстер | |
-| Розробник 1 | |
-| Розробник 2 | |
+| Розробник 1 | [@BullseyeProg](https://github.com/BullseyeProg) |
+| Розробник 2 | [@DemiD223](https://github.com/DemiD223) |
 | Розробник 3 | |
 
 Правила роботи з репозиторієм — у файлі [CONTRIBUTING.md](CONTRIBUTING.md).
