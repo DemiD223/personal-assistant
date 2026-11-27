@@ -53,6 +53,8 @@ class Birthday(Field):
             date = datetime.strptime(value, "%d.%m.%Y").date()
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
+        if date > datetime.now().date():
+            raise ValueError("Birthday cannot be in the future.")
         super().__init__(date)
 
     def __str__(self):
