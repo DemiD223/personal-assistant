@@ -22,9 +22,10 @@ MENU = """Available commands:
   change <name> <old> <new>      - change a phone
   phone <name>                   - show phones of a contact
   all                            - show all contacts
-  search-contact <query>        - search contacts
+  search-contact <query>         - search contacts
   add-note <text>                - add a note
-  search-note <query>           - search notes
+  search-note <query>            - search notes
+  edit-note <ID> <text>          - edit a note
   delete-note <ID>               - delete a note
   help                           - show this menu
   exit | close                   - quit"""
@@ -147,6 +148,20 @@ def search_note(args, notebook):
 
 
 @input_error
+def edit_note(args, notebook):
+    """Edit the text of a note by its ID."""
+    if len(args) < 2:
+        raise ValueError("Give me a note ID and new text please.")
+
+    note_id, *text_parts = args
+    if not note_id.isdigit():
+        raise ValueError("Note ID must be a number.")
+
+    notebook.edit(int(note_id), " ".join(text_parts))
+    return f"Note {note_id} updated."
+
+
+@input_error
 def delete_note(args, notebook):
     """Delete a note by its ID."""
     if not args:
@@ -203,6 +218,9 @@ def main():
             save_data(notebook, NOTEBOOK_FILE)
         elif command == "search-note":
             print(search_note(args, notebook))
+        elif command == "edit-note":
+            print(edit_note(args, notebook))
+            save_data(notebook, NOTEBOOK_FILE)
         elif command == "delete-note":
             print(delete_note(args, notebook))
             save_data(notebook, NOTEBOOK_FILE)
