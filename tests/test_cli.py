@@ -1,3 +1,4 @@
+import pytest
 
 from assistant.cli.bot import parse_input
 
@@ -41,8 +42,6 @@ def test_parse_command_case_insensitive():
     assert args == []
 
 
-def test_parse_unclosed_quotes():
-    import pytest
-
+def test_parse_unclosed_quotes():    
     with pytest.raises(ValueError):
         parse_input('add "Ivan Petrenko 0671234567')
