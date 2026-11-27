@@ -1,6 +1,6 @@
 """Record class: one contact with its fields (from homework 06)."""
 
-from assistant.contacts.fields import Name, Phone
+from assistant.contacts.fields import Address, Birthday, Email, Name, Phone
 
 
 class Record:
@@ -12,6 +12,9 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
+        self.email = None
+        self.address = None
+        self.birthday = None
 
     def add_phone(self, phone):
         """Add a new phone if it does not already exist."""
@@ -39,6 +42,18 @@ class Record:
         new_phone_obj = Phone(new_phone)
         index = self.phones.index(phone_obj)
         self.phones[index] = new_phone_obj
+
+    def add_email(self, email):
+        """Set or replace the contact's email."""
+        self.email = Email(email)
+
+    def add_address(self, address):
+        """Set or replace the contact's address."""
+        self.address = Address(address)
+
+    def add_birthday(self, birthday):
+        """Set or replace the contact's birthday."""
+        self.birthday = Birthday(birthday)
 
     def find_phone(self, phone):
         """Return the Phone object or None."""

@@ -15,6 +15,7 @@ from assistant.storage.storage import (
     load_data,
     save_data,
 )
+from assistant.contacts.birthdays import get_upcoming_birthdays
 
 MAIN_MENU = """Sections:
   contacts  - commands for contacts
@@ -28,7 +29,12 @@ SECTIONS = {
   change <name> <old> <new>      - change a phone
   phone <name>                   - show phones of a contact
   all                            - show all contacts
-  search-contact <query>         - search contacts""",
+  search-contact <query>         - search contacts
+  add-email <name> <email>       - add an email
+  add-address <name> <address>   - add an address
+  add-birthday <name> <date>     - add a birthday (DD.MM.YYYY)
+  show-birthday <name>           - show a birthday
+  birthdays [N]                  - birthdays in the next N days""",
     "notes": """Notes:
   add-note <text>                - add a note
   edit-note <ID> <text>          - edit a note
@@ -100,6 +106,72 @@ def show_phone(args, book):
     if record is None:
         raise KeyError(f"Contact {name} not found.")
     return "; ".join(p.value for p in record.phones) or "No phones."
+
+
+@input_error
+def add_email(args, book):
+    """Add or replace a contact's email."""
+    name, email = args
+    record = book.find(name)
+    if record is None:
+        raise KeyError(f"Contact {name} not found.")
+    record.add_email(email)
+    return "Email added."
+
+
+@input_error
+def add_address(args, book):
+    """Add or replace a contact's address."""
+    name, *address_parts = args
+    if not address_parts:
+        raise ValueError("Give me a name and an address please.")
+    record = book.find(name)
+    if record is None:
+        raise KeyError(f"Contact {name} not found.")
+    record.add_address(" ".join(address_parts))
+    return "Address added."
+
+
+@input_error
+def add_birthday(args, book):
+    """Add or replace a contact's birthday (DD.MM.YYYY)."""
+    name, birthday = args
+    record = book.find(name)
+    if record is None:
+        raise KeyError(f"Contact {name} not found.")
+    record.add_birthday(birthday)
+    return "Birthday added."
+
+
+@input_error
+def show_birthday(args, book):
+    """Show a contact's birthday."""
+    name = args[0]
+    record = book.find(name)
+    if record is None:
+        raise KeyError(f"Contact {name} not found.")
+    if record.birthday is None:
+        return f"{name} has no birthday set."
+    return f"{name}: {record.birthday}"
+
+
+@input_error
+def birthdays(args, book):
+    """Show birthdays in the next N days (7 by default)."""
+    days = 7
+    if args:
+        if not args[0].isdigit():
+            raise ValueError("Number of days must be a number.")
+        days = int(args[0])
+
+    upcoming = get_upcoming_birthdays(book, days)
+    if not upcoming:
+        return f"No birthdays in the next {days} days."
+
+    return "\n".join(
+        f"{record.name.value}: {when.strftime('%d.%m.%Y')}"
+        for record, when in upcoming
+    )
 
 
 @input_error
@@ -217,6 +289,19 @@ def main():
             save_data(book, CONTACTS_FILE)
         elif command == "phone":
             print(show_phone(args, book))
+        elif command == "add-email":
+            print(add_email(args, book))
+            save_data(book, CONTACTS_FILE)
+        elif command == "add-address":
+            print(add_address(args, book))
+            save_data(book, CONTACTS_FILE)
+        elif command == "add-birthday":
+            print(add_birthday(args, book))
+            save_data(book, CONTACTS_FILE)
+        elif command == "show-birthday":
+            print(show_birthday(args, book))
+        elif command == "birthdays":
+            print(birthdays(args, book))
         elif command == "all":
             print(show_all(book))
         elif command == "search-contact":

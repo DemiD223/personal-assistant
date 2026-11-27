@@ -1,54 +1,47 @@
-"""Upcoming birthdays helper (from homework 03).
+"""Upcoming birthdays helper (from homework 03), adapted to AddressBook."""
 
-Developer 2 adapts it to work with AddressBook and any number of days N.
-"""
-
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 
 
-def get_upcoming_birthdays(users, days=7):
-    """Return users to congratulate within the next `days` days.
+def _next_birthday(birthday, today):
+    """Return the next birthday date from today (29.02 -> 01.03)."""
+    for year in (today.year, today.year + 1):
+        try:
+            candidate = birthday.replace(year=year)
+        except ValueError:
+            candidate = date(year, 3, 1)
+        if candidate >= today:
+            return candidate
+    return candidate
 
-    Today is included.
 
-    Birthdays on a weekend are moved to the next Monday.
-    `users` is a list of dicts: {"name": str, "birthday": "YYYY.MM.DD"}.
+def get_upcoming_birthdays(book, days=7):
+    """Return contacts to congratulate within the next `days` days.
+
+    Today is included. Birthdays on a weekend move to the next Monday.
+    Returns a list of (record, congratulation_date) tuples sorted by date.
+
+    Examples:
+        get_upcoming_birthdays(book) -> birthdays in the next 7 days
+        get_upcoming_birthdays(book, 30) -> birthdays in the next 30 days
     """
-    today = datetime.today().date()
+    today = date.today()
     upcoming = []
 
-    for user in users:
-        birthday = datetime.strptime(user["birthday"], "%Y.%m.%d").date()
+    for record in book.data.values():
+        if record.birthday is None:
+            continue
 
-        try:
-            birthday_this_year = birthday.replace(year=today.year)
-        except ValueError:
-            birthday_this_year = birthday.replace(
-                year=today.year, month=3, day=1
-            )
+        next_birthday = _next_birthday(record.birthday.value, today)
+        if (next_birthday - today).days >= days:
+            continue
 
-        if birthday_this_year < today:
-            try:
-                birthday_this_year = birthday.replace(year=today.year + 1)
-            except ValueError:
-                birthday_this_year = birthday.replace(
-                    year=today.year + 1, month=3, day=1
-                )
+        congratulation_date = next_birthday
+        if congratulation_date.weekday() == 5:
+            congratulation_date += timedelta(days=2)
+        elif congratulation_date.weekday() == 6:
+            congratulation_date += timedelta(days=1)
 
-        days_until = (birthday_this_year - today).days
+        upcoming.append((record, congratulation_date))
 
-        if 0 <= days_until < days:
-            congratulation_date = birthday_this_year
-            if congratulation_date.weekday() == 5:
-                congratulation_date += timedelta(days=2)
-            elif congratulation_date.weekday() == 6:
-                congratulation_date += timedelta(days=1)
-
-            upcoming.append({
-                "name": user["name"],
-                "congratulation_date": congratulation_date.strftime(
-                    "%Y.%m.%d"
-                ),
-            })
-
-    return upcoming
+    return sorted(upcoming, key=lambda item: item[1])
