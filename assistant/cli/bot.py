@@ -16,19 +16,25 @@ from assistant.storage.storage import (
     save_data,
 )
 
-MENU = """Available commands:
-  hello                          - greeting
-  add <name> <phone>             - add a contact or a phone to it
+MAIN_MENU = """Sections:
+  contacts  - commands for contacts
+  notes     - commands for notes
+  help      - show this menu
+  exit      - quit"""
+
+SECTIONS = {
+    "contacts": """Contacts:
+  add <name> <phone>             - add a contact or a phone
   change <name> <old> <new>      - change a phone
   phone <name>                   - show phones of a contact
   all                            - show all contacts
-  search-contact <query>         - search contacts
+  search-contact <query>         - search contacts""",
+    "notes": """Notes:
   add-note <text>                - add a note
-  search-note <query>            - search notes
   edit-note <ID> <text>          - edit a note
-  delete-note <ID>               - delete a note
-  help                           - show this menu
-  exit | close                   - quit"""
+  search-note <query>            - search notes
+  delete-note <ID>               - delete a note""",
+}
 
 
 def parse_input(user_input: str):
@@ -178,7 +184,7 @@ def main():
     book = load_data(CONTACTS_FILE, AddressBook)
     notebook = load_data(NOTEBOOK_FILE, NoteBook)
     print("Welcome to the assistant bot!")
-    print(MENU)
+    print(MAIN_MENU)
     while True:
         try:
             user_input = input("Enter a command: ")
@@ -200,7 +206,9 @@ def main():
         elif command == "hello":
             print("How can I help you?")
         elif command == "help":
-            print(MENU)
+            print(MAIN_MENU)
+        elif command in SECTIONS:
+            print(SECTIONS[command])
         elif command == "add":
             print(add_contact(args, book))
             save_data(book, CONTACTS_FILE)
