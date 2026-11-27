@@ -28,6 +28,9 @@ SECTIONS = {
   add <name> <phone>             - add a contact or a phone
   change <name> <old> <new>      - change a phone
   phone <name>                   - show phones of a contact
+  rename <old> <new>             - rename a contact
+  remove-phone <name> <phone>    - remove a phone
+  delete-contact <name>          - delete a contact
   all                            - show all contacts
   search-contact <query>         - search contacts
   add-email <name> <email>       - add an email
@@ -106,6 +109,47 @@ def show_phone(args, book):
     if record is None:
         raise KeyError(f"Contact {name} not found.")
     return "; ".join(p.value for p in record.phones) or "No phones."
+
+
+@input_error
+def delete_contact(args, book):
+    """Delete a contact by name."""
+    if not args:
+        raise ValueError("Give me a name please.")
+    name = args[0]
+    if book.find(name) is None:
+        raise KeyError(f"Contact {name} not found.")
+    book.delete(name)
+    return f"Contact {name} deleted."
+
+
+@input_error
+def rename_contact(args, book):
+    """Rename a contact."""
+    if len(args) < 2:
+        raise ValueError("Give me old and new name please.")
+    old_name, new_name, *_ = args
+    if book.find(old_name) is None:
+        raise KeyError(f"Contact {old_name} not found.")
+    if book.find(new_name) is not None:
+        raise ValueError(f"Contact {new_name} already exists.")
+    book.rename(old_name, new_name)
+    return "Contact renamed."
+
+
+@input_error
+def remove_phone(args, book):
+    """Remove a phone from a contact."""
+    if len(args) < 2:
+        raise ValueError("Give me name and phone please.")
+    name, phone, *_ = args
+    record = book.find(name)
+    if record is None:
+        raise KeyError(f"Contact {name} not found.")
+    if record.find_phone(phone) is None:
+        raise ValueError("Phone not found.")
+    record.remove_phone(phone)
+    return "Phone removed."
 
 
 @input_error
@@ -289,6 +333,15 @@ def main():
             save_data(book, CONTACTS_FILE)
         elif command == "phone":
             print(show_phone(args, book))
+        elif command == "delete-contact":
+            print(delete_contact(args, book))
+            save_data(book, CONTACTS_FILE)
+        elif command == "rename":
+            print(rename_contact(args, book))
+            save_data(book, CONTACTS_FILE)
+        elif command == "remove-phone":
+            print(remove_phone(args, book))
+            save_data(book, CONTACTS_FILE)
         elif command == "add-email":
             print(add_email(args, book))
             save_data(book, CONTACTS_FILE)

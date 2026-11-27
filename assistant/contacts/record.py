@@ -64,4 +64,11 @@ class Record:
 
     def __str__(self):
         phones = "; ".join(p.value for p in self.phones)
-        return f"Contact name: {self.name.value}, phones: {phones}"
+        parts = [f"Contact name: {self.name.value}", f"phones: {phones}"]
+        if self.email:
+            parts.append(f"email: {self.email}")
+        if self.address:
+            parts.append(f"address: {self.address}")
+        if self.birthday:
+            parts.append(f"birthday: {self.birthday}")
+        return ", ".join(parts)
