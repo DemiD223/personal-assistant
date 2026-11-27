@@ -160,8 +160,8 @@ def birthdays(args, book):
     """Show birthdays in the next N days (7 by default)."""
     days = 7
     if args:
-        if not args[0].isdigit():
-            raise ValueError("Number of days must be a number.")
+        if not args[0].isdigit() or int(args[0]) == 0:
+            raise ValueError("Number of days must be a positive integer.")
         days = int(args[0])
 
     upcoming = get_upcoming_birthdays(book, days)
