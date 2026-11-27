@@ -1,6 +1,7 @@
 """AddressBook: storage of contact records (from homework 06)."""
 
 from collections import UserDict
+from assistant.contacts.fields import Name
 
 
 class AddressBook(UserDict):
@@ -18,6 +19,12 @@ class AddressBook(UserDict):
         """Delete a record by name if it exists."""
         if name in self.data:
             del self.data[name]
+
+    def rename(self, old_name, new_name):
+        """Rename a contact."""
+        record = self.data.pop(old_name)
+        record.name = Name(new_name)
+        self.data[new_name] = record
 
     def search(self, query: str):
         """Search contacts by partial name or phone number.
