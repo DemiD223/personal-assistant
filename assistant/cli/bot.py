@@ -31,7 +31,20 @@ MENU = """Available commands:
 
 
 def parse_input(user_input: str):
-    """Parse command and arguments with quoted strings."""
+    """Parse command and arguments with quoted strings.
+
+    Examples:
+        parse_input('add "John Doe" 12345')
+        -> ('add', ['John Doe', '12345'])
+        parse_input('change "John Doe" 12345 67890')
+        -> ('change', ['John Doe', '12345', '67890'])
+        parse_input('phone "John Doe"')
+        -> ('phone', ['John Doe'])
+        parse_input('add-note "Meeting at 10am"')
+        -> ('add-note', ['Meeting at 10am'])
+        parse_input('delete-note 1')
+        -> ('delete-note', ['1'])
+    """
     parts = shlex.split(user_input)
 
     if not parts:
@@ -39,30 +52,6 @@ def parse_input(user_input: str):
 
     cmd, *args = parts
     return cmd.lower(), args
-
-
-"""
-What we get after my implementation of the parse_input function:
-
-- add "Ivan Petrenko" 0671234567 - will return:
-  cmd = 'add'
-  args = ['Ivan Petrenko', '0671234567']
-
-- parse_input('add "John Doe" 12345') — will return:
-  ('add', ['John Doe', '12345'])
-
-- parse_input('change "John Doe" 12345 67890') — will return:
-  ('change', ['John Doe', '12345', '67890'])
-
-- parse_input('phone "John Doe"') — will return:
-  ('phone', ['John Doe'])
-
-- parse_input('add-note "Meeting at 10am"') — will return:
-  ('add-note', ['Meeting at 10am'])
-
-- parse_input('delete-note 1') — will return:
-  ('delete-note', ['1'])
-"""
 
 
 @input_error

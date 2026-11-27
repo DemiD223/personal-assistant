@@ -20,8 +20,13 @@ class AddressBook(UserDict):
             del self.data[name]
 
     def search(self, query: str):
-        """
-        Search contacts by partial name or phone number.
+        """Search contacts by partial name or phone number.
+
+        Examples:
+            search("ivan") -> finds Ivan Petrenko
+            search("petrenko") -> finds by last name
+            search("067") -> finds by part of the phone number
+            search("") -> returns an empty list
         """
         query = query.strip().lower()
 
@@ -50,12 +55,3 @@ class AddressBook(UserDict):
                     break
 
         return results
-
-
-"""
-What we get after my implementation of the search method:
-- search("ivan") — will find Ivan Petrenko;
-- search("petrenko") — will find by last name;
-- search("067") — will find by part of the phone number;
-- search("") — will return an empty list.
-"""
