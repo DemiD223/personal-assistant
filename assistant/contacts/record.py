@@ -14,7 +14,10 @@ class Record:
         self.phones = []
 
     def add_phone(self, phone):
-        """Add a new phone to the contact."""
+        """Add a new phone if it does not already exist."""
+        if self.find_phone(phone):
+            raise ValueError(f"Phone {phone} already exists.")
+
         self.phones.append(Phone(phone))
 
     def remove_phone(self, phone):
@@ -26,8 +29,13 @@ class Record:
     def edit_phone(self, old_phone, new_phone):
         """Replace an old phone with a new one."""
         phone_obj = self.find_phone(old_phone)
+
         if not phone_obj:
             raise ValueError("Phone not found.")
+
+        if old_phone != new_phone and self.find_phone(new_phone):
+            raise ValueError(f"Phone {new_phone} already exists.")
+
         new_phone_obj = Phone(new_phone)
         index = self.phones.index(phone_obj)
         self.phones[index] = new_phone_obj

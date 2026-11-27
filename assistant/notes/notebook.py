@@ -14,9 +14,16 @@ class NoteBook(UserDict):
         self._next_id += 1
         return note_id
 
-    def find(self, query):
-        """Return notes by query"""
-        query = query.lower()
+    def find(self, query: str):
+        """
+        Find notes by partial text.
+        Returns a dictionary with note IDs and notes.
+        """
+        query = query.strip().lower()
+
+        if not query:
+            return {}
+
         return {
             note_id: note
             for note_id, note in self.data.items()
@@ -34,3 +41,11 @@ class NoteBook(UserDict):
         if note_id not in self.data:
             raise KeyError(f"Note {note_id} not found")
         del self.data[note_id]
+
+
+"""
+Examples of using the find method:
+- find("meeting") — finds notes containing the word "meeting";
+- find("project") — finds notes containing the word "project";
+- find("2024") — finds notes containing the year "2024".
+"""
