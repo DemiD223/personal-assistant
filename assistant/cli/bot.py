@@ -3,6 +3,8 @@
 Handlers work with AddressBook and Record from homework 06.
 """
 
+import shlex
+
 from assistant.cli.decorators import input_error
 from assistant.contacts import AddressBook, Record
 from assistant.notes.note import Note
@@ -20,16 +22,36 @@ MENU = """Available commands:
   change <name> <old> <new>      - change a phone
   phone <name>                   - show phones of a contact
   all                            - show all contacts
+  search-contact <query>        - search contacts
   add-note <text>                - add a note
+  search-note <query>           - search notes
   delete-note <ID>               - delete a note
   help                           - show this menu
   exit | close                   - quit"""
 
 
-def parse_input(user_input):
-    """Split user input into a lowercase command and arguments."""
-    cmd, *args = user_input.split()
-    return cmd.strip().lower(), *args
+def parse_input(user_input: str):
+    """Parse command and arguments with quoted strings.
+
+    Examples:
+        parse_input('add "John Doe" 12345')
+        -> ('add', ['John Doe', '12345'])
+        parse_input('change "John Doe" 12345 67890')
+        -> ('change', ['John Doe', '12345', '67890'])
+        parse_input('phone "John Doe"')
+        -> ('phone', ['John Doe'])
+        parse_input('add-note "Meeting at 10am"')
+        -> ('add-note', ['Meeting at 10am'])
+        parse_input('delete-note 1')
+        -> ('delete-note', ['1'])
+    """
+    parts = shlex.split(user_input)
+
+    if not parts:
+        return "", []
+
+    cmd, *args = parts
+    return cmd.lower(), args
 
 
 @input_error
@@ -74,6 +96,21 @@ def show_phone(args, book):
 
 
 @input_error
+def search_contact(args, book):
+    """Search contacts by name or phone."""
+    if not args:
+        raise ValueError("Give me a search query please.")
+
+    query = " ".join(args)
+    results = book.search(query)
+
+    if not results:
+        return "No contacts found."
+
+    return "\n".join(str(record) for record in results)
+
+
+@input_error
 def show_all(book):
     """Show all contacts."""
     if not book:
@@ -89,6 +126,24 @@ def add_note(args, notebook):
     note = Note(" ".join(args))
     note_id = notebook.add(note)
     return f"Note {note_id} added."
+
+
+@input_error
+def search_note(args, notebook):
+    """Search notes by text."""
+    if not args:
+        raise ValueError("Give me a search query please.")
+
+    query = " ".join(args)
+    results = notebook.find(query)
+
+    if not results:
+        return "No notes found."
+
+    return "\n".join(
+        f"ID: {note_id} | {note.text}"
+        for note_id, note in results.items()
+    )
 
 
 @input_error
@@ -118,7 +173,11 @@ def main():
         if not user_input.strip():
             print("Invalid command.")
             continue
-        command, *args = parse_input(user_input)
+        try:
+            command, args = parse_input(user_input)
+        except ValueError:
+            print("Invalid command format. Check quotation marks.")
+            continue
 
         if command in ("close", "exit"):
             print("Good bye!")
@@ -137,9 +196,13 @@ def main():
             print(show_phone(args, book))
         elif command == "all":
             print(show_all(book))
+        elif command == "search-contact":
+            print(search_contact(args, book))
         elif command == "add-note":
             print(add_note(args, notebook))
             save_data(notebook, NOTEBOOK_FILE)
+        elif command == "search-note":
+            print(search_note(args, notebook))
         elif command == "delete-note":
             print(delete_note(args, notebook))
             save_data(notebook, NOTEBOOK_FILE)
