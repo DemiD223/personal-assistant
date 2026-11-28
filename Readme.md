@@ -65,6 +65,6 @@ personal-assistant/
 | Скрам-майстер | |
 | Розробник 1 | [@BullseyeProg](https://github.com/BullseyeProg) |
 | Розробник 2 | [@DemiD223](https://github.com/DemiD223) |
-| Розробник 3 | |
+| Розробник 3 | Hrigoriu |
 
 Правила роботи з репозиторієм — у файлі [CONTRIBUTING.md](CONTRIBUTING.md).
